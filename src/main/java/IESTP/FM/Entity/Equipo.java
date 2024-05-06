@@ -1,7 +1,9 @@
 package IESTP.FM.Entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "Equipo")
@@ -11,14 +13,14 @@ public class Equipo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "tipo_equipo", nullable = false, length = 100)
-    private String tipoEquipo;
+    @Column(name = "tipoE", nullable = false, length = 100)
+    private String tipoE;
 
-    @Column(name = "codigo_barra", nullable = false, length = 255)
-    private String codigoBarra;
+    @Column(name = "codigoB", nullable = false, length = 255)
+    private String codigoB;
 
-    @Column(name = "codigo_patrimonial", nullable = false, length = 255)
-    private String codigoPatrimonial;
+    @Column(name = "codigoP", nullable = false, length = 255)
+    private String codigoP;
 
     @Column(name = "descripcion", nullable = false, length = 255)
     private String descripcion;
@@ -26,8 +28,9 @@ public class Equipo {
     @Column(name = "estado", nullable = false, length = 100)
     private String estado;
 
-    @Column(name = "fecha_compra", nullable = false)
-    private LocalDateTime fechaCompra;
+    @Column(name = "fecha", nullable = false)
+    @JsonFormat(pattern = "dd-MM-yyyy")
+    private LocalDate fecha;
 
     @Column(name = "marca", nullable = false, length = 100)
     private String marca;
@@ -35,11 +38,8 @@ public class Equipo {
     @Column(name = "modelo", nullable = false, length = 100)
     private String modelo;
 
-    @Column(name = "nombre_equipo", nullable = false, length = 255)
-    private String nombreEquipo;
-
-    @Column(name = "numero_orden", nullable = false, length = 100)
-    private String numeroOrden;
+    @Column(name = "nombreE", nullable = false, length = 255)
+    private String nombreE;
 
     @Column(name = "serie", nullable = false, length = 255)
     private String serie;
@@ -52,30 +52,6 @@ public class Equipo {
     @JoinColumn(name = "ubicacion_id")
     private Ubicacion ubicacion;
 
-    public Equipo() {
-    }
-
-    public Equipo(Integer id) {
-        this.id = id;
-    }
-
-    public Equipo(Integer id, String tipoEquipo, String codigoBarra, String codigoPatrimonial, String descripcion, String estado, LocalDateTime fechaCompra, String marca, String modelo, String nombreEquipo, String numeroOrden, String serie, Empleado responsable, Ubicacion ubicacion) {
-        this.id = id;
-        this.tipoEquipo = tipoEquipo;
-        this.codigoBarra = codigoBarra;
-        this.codigoPatrimonial = codigoPatrimonial;
-        this.descripcion = descripcion;
-        this.estado = estado;
-        this.fechaCompra = fechaCompra;
-        this.marca = marca;
-        this.modelo = modelo;
-        this.nombreEquipo = nombreEquipo;
-        this.numeroOrden = numeroOrden;
-        this.serie = serie;
-        this.responsable = responsable;
-        this.ubicacion = ubicacion;
-    }
-
     public int getId() {
         return id;
     }
@@ -84,28 +60,28 @@ public class Equipo {
         this.id = id;
     }
 
-    public String getTipoEquipo() {
-        return tipoEquipo;
+    public String getTipoE() {
+        return tipoE;
     }
 
-    public void setTipoEquipo(String tipoEquipo) {
-        this.tipoEquipo = tipoEquipo;
+    public void setTipoE(String tipoE) {
+        this.tipoE = tipoE;
     }
 
-    public String getCodigoBarra() {
-        return codigoBarra;
+    public String getCodigoB() {
+        return codigoB;
     }
 
-    public void setCodigoBarra(String codigoBarra) {
-        this.codigoBarra = codigoBarra;
+    public void setCodigoB(String codigoB) {
+        this.codigoB = codigoB;
     }
 
-    public String getCodigoPatrimonial() {
-        return codigoPatrimonial;
+    public String getCodigoP() {
+        return codigoP;
     }
 
-    public void setCodigoPatrimonial(String codigoPatrimonial) {
-        this.codigoPatrimonial = codigoPatrimonial;
+    public void setCodigoP(String codigoP) {
+        this.codigoP = codigoP;
     }
 
     public String getDescripcion() {
@@ -124,12 +100,12 @@ public class Equipo {
         this.estado = estado;
     }
 
-    public LocalDateTime getFechaCompra() {
-        return fechaCompra;
+    public LocalDate getFecha() {
+        return fecha;
     }
 
-    public void setFechaCompra(LocalDateTime fechaCompra) {
-        this.fechaCompra = fechaCompra;
+    public void setFecha(LocalDate fecha) {
+        this.fecha = fecha;
     }
 
     public String getMarca() {
@@ -148,20 +124,12 @@ public class Equipo {
         this.modelo = modelo;
     }
 
-    public String getNombreEquipo() {
-        return nombreEquipo;
+    public String getNombreE() {
+        return nombreE;
     }
 
-    public void setNombreEquipo(String nombreEquipo) {
-        this.nombreEquipo = nombreEquipo;
-    }
-
-    public String getNumeroOrden() {
-        return numeroOrden;
-    }
-
-    public void setNumeroOrden(String numeroOrden) {
-        this.numeroOrden = numeroOrden;
+    public void setNombreE(String nombreE) {
+        this.nombreE = nombreE;
     }
 
     public String getSerie() {
