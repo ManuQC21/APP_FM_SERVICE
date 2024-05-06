@@ -8,7 +8,7 @@ public class DetalleMovimiento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(name = "cantidad")
     private int cantidad;
@@ -27,11 +27,11 @@ public class DetalleMovimiento {
     public DetalleMovimiento() {
     }
 
-    public DetalleMovimiento(Long id) {
+    public DetalleMovimiento(Integer id) {
         this.id = id;
     }
 
-    public DetalleMovimiento(Long id, int cantidad, String tipoMovimiento, String observaciones, Movimiento movimiento) {
+    public DetalleMovimiento(Integer id, int cantidad, String tipoMovimiento, String observaciones, Movimiento movimiento) {
         this.id = id;
         this.cantidad = cantidad;
         this.tipoMovimiento = tipoMovimiento;
@@ -39,11 +39,11 @@ public class DetalleMovimiento {
         this.movimiento = movimiento;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

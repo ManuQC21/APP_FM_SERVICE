@@ -9,7 +9,7 @@ public class Movimiento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(name = "fecha_movimiento", nullable = false)
     private LocalDateTime fechaMovimiento;
@@ -35,11 +35,11 @@ public class Movimiento {
     public Movimiento() {
     }
 
-    public Movimiento(Long id) {
+    public Movimiento(Integer id) {
         this.id = id;
     }
 
-    public Movimiento(Long id, LocalDateTime fechaMovimiento, String nombreResponsable, String motivoMovimiento, Equipo equipo, Ubicacion ubicacionOrigen, Ubicacion ubicacionDestino) {
+    public Movimiento(Integer id, LocalDateTime fechaMovimiento, String nombreResponsable, String motivoMovimiento, Equipo equipo, Ubicacion ubicacionOrigen, Ubicacion ubicacionDestino) {
         this.id = id;
         this.fechaMovimiento = fechaMovimiento;
         this.nombreResponsable = nombreResponsable;
@@ -49,11 +49,11 @@ public class Movimiento {
         this.ubicacionDestino = ubicacionDestino;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

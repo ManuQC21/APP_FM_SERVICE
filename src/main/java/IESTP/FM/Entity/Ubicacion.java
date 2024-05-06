@@ -8,7 +8,7 @@ public class Ubicacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(name = "ambiente", nullable = false, length = 255)
     private String ambiente;
@@ -19,21 +19,21 @@ public class Ubicacion {
     public Ubicacion() {
     }
 
-    public Ubicacion(Long id) {
+    public Ubicacion(Integer id) {
         this.id = id;
     }
 
-    public Ubicacion(Long id, String ambiente, String ubicacionFisica) {
+    public Ubicacion(Integer id, String ambiente, String ubicacionFisica) {
         this.id = id;
         this.ambiente = ambiente;
         this.ubicacionFisica = ubicacionFisica;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

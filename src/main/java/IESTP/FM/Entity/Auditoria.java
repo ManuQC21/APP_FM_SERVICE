@@ -10,7 +10,7 @@ public class Auditoria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(name = "fecha_auditoria", nullable = false)
     private LocalDateTime fechaAuditoria;
@@ -28,11 +28,11 @@ public class Auditoria {
     public Auditoria() {
     }
 
-    public Auditoria(Long id) {
+    public Auditoria(Integer id) {
         this.id = id;
     }
 
-    public Auditoria(Long id, LocalDateTime fechaAuditoria, String observaciones, String estadoAuditoria, Equipo equipo) {
+    public Auditoria(Integer id, LocalDateTime fechaAuditoria, String observaciones, String estadoAuditoria, Equipo equipo) {
         this.id = id;
         this.fechaAuditoria = fechaAuditoria;
         this.observaciones = observaciones;
@@ -48,11 +48,11 @@ public class Auditoria {
         this.fechaAuditoria = fechaAuditoria;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

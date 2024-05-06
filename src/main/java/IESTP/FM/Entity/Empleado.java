@@ -8,7 +8,7 @@ public class Empleado {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(name = "nombre", nullable = false, length = 255)
     private String nombre;
@@ -21,11 +21,11 @@ public class Empleado {
     }
 
     // Getters y setters
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

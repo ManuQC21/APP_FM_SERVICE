@@ -8,7 +8,7 @@ public class DetalleAuditoria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(name = "resultado_auditoria", length = 100)
     private String resultadoAuditoria;
@@ -24,22 +24,22 @@ public class DetalleAuditoria {
     public DetalleAuditoria() {
     }
 
-    public DetalleAuditoria(Long id) {
+    public DetalleAuditoria(Integer id) {
         this.id = id;
     }
 
-    public DetalleAuditoria(Long id, String resultadoAuditoria, String observaciones, Auditoria auditoria) {
+    public DetalleAuditoria(Integer id, String resultadoAuditoria, String observaciones, Auditoria auditoria) {
         this.id = id;
         this.resultadoAuditoria = resultadoAuditoria;
         this.observaciones = observaciones;
         this.auditoria = auditoria;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
