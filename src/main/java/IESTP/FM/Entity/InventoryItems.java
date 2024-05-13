@@ -5,8 +5,8 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "Equipo")
-public class Equipo {
+@Table(name = "Informacion")
+public class InventoryItems {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,8 +27,7 @@ public class Equipo {
     @Column(name = "estado", nullable = false, length = 100)
     private String estado;
 
-    @Column(name = "fecha_compra", nullable = false)
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate fechaCompra;
 
     @Column(name = "marca", nullable = false, length = 100)
@@ -54,14 +53,14 @@ public class Equipo {
     @JoinColumn(name = "ubicacion_id", nullable = true)
     private Ubicacion ubicacion;
 
-    public Equipo() {
+    public InventoryItems() {
     }
 
-    public Equipo(int id) {
+    public InventoryItems(int id) {
         this.id = id;
     }
 
-    public Equipo(int id, String tipoEquipo, String codigoBarra, String codigoPatrimonial, String descripcion, String estado, LocalDate fechaCompra, String marca, String modelo, String nombreEquipo, String numeroOrden, String serie, Empleado responsable, Ubicacion ubicacion) {
+    public InventoryItems(int id, String tipoEquipo, String codigoBarra, String codigoPatrimonial, String descripcion, String estado, LocalDate fechaCompra, String marca, String modelo, String nombreEquipo, String numeroOrden, String serie, Empleado responsable, Ubicacion ubicacion) {
         this.id = id;
         this.tipoEquipo = tipoEquipo;
         this.codigoBarra = codigoBarra;
@@ -76,22 +75,6 @@ public class Equipo {
         this.serie = serie;
         this.responsable = responsable;
         this.ubicacion = ubicacion;
-    }
-    public Equipo(InventoryItems inventoryItems) {
-        this.id = id;
-        this.tipoEquipo = inventoryItems.getTipoEquipo();
-        this.codigoBarra = inventoryItems.getCodigoBarra();
-        this.codigoPatrimonial = inventoryItems.getCodigoPatrimonial();
-        this.descripcion = inventoryItems.getDescripcion();
-        this.estado = inventoryItems.getEstado();
-        this.fechaCompra = inventoryItems.getFechaCompra();
-        this.marca = inventoryItems.getMarca();
-        this.modelo = inventoryItems.getModelo();
-        this.nombreEquipo = inventoryItems.getNombreEquipo();
-        this.numeroOrden = inventoryItems.getNumeroOrden();
-        this.serie = inventoryItems.getSerie();
-        this.responsable = inventoryItems.getResponsable();
-        this.ubicacion = inventoryItems.getUbicacion();
     }
 
     public int getId() {

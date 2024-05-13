@@ -3,13 +3,17 @@ package IESTP.FM.Controller;
 import IESTP.FM.Entity.Equipo;
 import IESTP.FM.Service.EquipoService;
 import IESTP.FM.utils.GenericResponse;
+import IESTP.FM.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import java.util.List;
 
 @RestController
-@RequestMapping("equipo")
+@RequestMapping("/equipo")
 public class EquipoController {
 
     @Autowired
@@ -29,16 +33,38 @@ public class EquipoController {
     public GenericResponse<Void> deleteEquipo(@PathVariable Integer id) {
         return equipoService.deleteEquipo(id);
     }
-    // Endpoint para listar todos los equipos
+
     @GetMapping("/listar")
     public GenericResponse<List<Equipo>> listAllEquipos() {
         return equipoService.findAllEquipos();
     }
-
-    // Endpoint para buscar un equipo por codigoP
-    @GetMapping("/buscar/{codigoP}")
-    public GenericResponse<Equipo> findEquipoByCodigoP(@PathVariable String codigoP) {
-        return equipoService.findEquipoByCodigoP(codigoP);
+    @GetMapping("/buscarPorCodigoPatrimonial/{codigoPatrimonial}")
+    public ResponseEntity<GenericResponse<Equipo>> findEquipoByCodigoPatrimonial(@PathVariable String codigoPatrimonial) {
+        GenericResponse<Equipo> response = equipoService.findEquipoByCodigoPatrimonial(codigoPatrimonial);
+        return response.getRpta() == Global.RPTA_OK ? ResponseEntity.ok(response) : ResponseEntity.status(404).body(response);
+    }
+    @PostMapping("/escanearCodigoBarra")
+    public ResponseEntity<GenericResponse<Equipo>> escanearCodigoBarra(@RequestParam("file") MultipartFile file) {
+        GenericResponse<Equipo> response = equipoService.scanAndCopyBarcodeData(file);
+        return response.getRpta() == 1 ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
     }
 
+    @GetMapping("/descargarReporte")
+    public ResponseEntity<byte[]> downloadExcelReport() {
+        try {
+            byte[] report = equipoService.generateExcelReport();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=equipos.xlsx");
+            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(report);
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(null);
+        }
+    }
 }
+

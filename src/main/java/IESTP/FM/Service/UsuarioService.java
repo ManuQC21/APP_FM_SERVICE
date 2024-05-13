@@ -4,6 +4,7 @@ import IESTP.FM.Entity.Usuario;
 import IESTP.FM.Repository.UsuarioRepository;
 import IESTP.FM.utils.GenericResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Optional;
@@ -15,17 +16,20 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository repository;
 
-    // Método para iniciar sesión
+    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    public GenericResponse<Usuario> register(Usuario usuario) {
+        usuario.setClave(passwordEncoder.encode(usuario.getClave())); // Encripta la contraseña
+        Usuario savedUsuario = repository.save(usuario);
+        return new GenericResponse<>("SUCCESS", 1, "Usuario registrado exitosamente.", savedUsuario);
+    }
+
     public GenericResponse<Usuario> login(String correo, String clave) {
         Optional<Usuario> usuarioOpt = repository.findByCorreo(correo);
-        if (usuarioOpt.isPresent()) {
-            Usuario usuario = usuarioOpt.get();
-            if (usuario.getClave().equals(clave)) {
-                return new GenericResponse<>("AUTH", 1, "Haz iniciado sesión correctamente", usuario);
-            } else {
-                return new GenericResponse<>("AUTH", 2, "Contraseña incorrecta", null);
-            }
+        if (usuarioOpt.isPresent() && passwordEncoder.matches(clave, usuarioOpt.get().getClave())) {
+            return new GenericResponse<>("SUCCESS", 1, "Inicio de sesión exitoso.", usuarioOpt.get());
+        } else {
+            return new GenericResponse<>("ERROR", 0, "Credenciales incorrectas.", null);
         }
-        return new GenericResponse<>("AUTH", 2, "Usuario no encontrado", null);
     }
 }

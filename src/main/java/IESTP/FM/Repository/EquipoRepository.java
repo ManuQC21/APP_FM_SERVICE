@@ -8,5 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface EquipoRepository extends CrudRepository<Equipo, Integer> {
-    Optional<Equipo> findByCodigoP(String codigoP);
+    Optional<Equipo> findByCodigoPatrimonial(String codigoPatrimonial);
+
 }

@@ -10,7 +10,7 @@ public class Usuario {
     private int id;
     @Column(length = 500)
     private String correo;
-    @Column(length = 30)
+    @Column(length = 300)
     private String clave;
     @Column
     private boolean vigencia;
