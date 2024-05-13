@@ -4,18 +4,19 @@ import IESTP.FM.Entity.InventoryItems;
 import IESTP.FM.Repository.InventoryItemsRepository;
 import IESTP.FM.utils.GenericResponse;
 import IESTP.FM.utils.Global;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,11 +29,12 @@ public class InventoryItemsService {
     public GenericResponse<InventoryItems> saveInformacion(InventoryItems inventoryItems) {
         try {
             InventoryItems savedInventoryItems = inventoryItemsRepository.save(inventoryItems);
-            return new GenericResponse<>("SUCCESS", 1, "Información guardada exitosamente", savedInventoryItems);
+            return new GenericResponse<>("SUCCESS", Global.RPTA_OK, "Información guardada exitosamente", savedInventoryItems);
         } catch (Exception e) {
-            return new GenericResponse<>("ERROR", -1, "Error al guardar la información: " + e.getMessage(), null);
+            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Error al guardar la información: " + e.getMessage(), null);
         }
     }
+
     public GenericResponse<List<InventoryItems>> findAllInformacion() {
         try {
             List<InventoryItems> allInventoryItems = (List<InventoryItems>) inventoryItemsRepository.findAll();
@@ -41,18 +43,19 @@ public class InventoryItemsService {
             return new GenericResponse<>(Global.TIPO_DATA, Global.RPTA_ERROR, "Error al obtener el listado: " + e.getMessage(), null);
         }
     }
+
     public GenericResponse<byte[]> generateBarcodeImageForPatrimonialCode(String codigoPatrimonial) {
         Optional<InventoryItems> informacion = inventoryItemsRepository.findByCodigoPatrimonial(codigoPatrimonial);
         if (informacion.isPresent()) {
             try {
                 InventoryItems info = informacion.get();
                 String barcodeData = info.getCodigoBarra();  // Use only the barcode number
-                return new GenericResponse<>("SUCCESS", 1, "Código de barras generado exitosamente", generateBarcodeImage(barcodeData));
+                return new GenericResponse<>("SUCCESS", Global.RPTA_OK, "Código de barras generado exitosamente", generateBarcodeImage(barcodeData));
             } catch (Exception e) {
-                return new GenericResponse<>("ERROR", -1, "Error al generar el código de barras: " + e.getMessage(), null);
+                return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Error al generar el código de barras: " + e.getMessage(), null);
             }
         } else {
-            return new GenericResponse<>("ERROR", -1, "No se encontró información para el código patrimonial proporcionado", null);
+            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "No se encontró información para el código patrimonial proporcionado", null);
         }
     }
 

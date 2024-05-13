@@ -5,6 +5,7 @@ public class Global {
         A,
         I
     }
+
     public static final String TIPO_RESULT = "result";
     public static final String TIPO_DATA = "data";
     public static final String TIPO_AUTH = "auth";

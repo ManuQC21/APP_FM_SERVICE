@@ -5,17 +5,11 @@ public class GenericResponse<T> {
     private int rpta;
     private String message;
     private T body;
-    public GenericResponse() {
-        type = "";
-        rpta = 0;
-        message = "";
-        body = null;
-    }
 
-    public GenericResponse(String bodyType, Object body) {
-        type = "";
-        rpta = 0;
-        message = "";
+    public GenericResponse() {
+        this.type = "";
+        this.rpta = 0;
+        this.message = "";
         this.body = null;
     }
 

@@ -7,25 +7,27 @@ import IESTP.FM.Repository.InventoryItemsRepository;
 import IESTP.FM.utils.GenericResponse;
 import IESTP.FM.utils.Global;
 import com.google.zxing.MultiFormatReader;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.LuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import java.io.ByteArrayOutputStream;
-import java.util.List;
+
 @Service
 @Transactional
 public class EquipoService {
@@ -35,13 +37,14 @@ public class EquipoService {
 
     @Autowired
     private InventoryItemsRepository inventoryItemsRepository;
+
     public GenericResponse<Equipo> addEquipo(Equipo equipo) {
         try {
             equipo.setCodigoBarra(generateRandomBarcode(12));
             Equipo savedEquipo = equipoRepository.save(equipo);
-            return new GenericResponse<>("SUCCESS", 1, "Equipo registrado exitosamente.", savedEquipo);
+            return new GenericResponse<>("SUCCESS", Global.RPTA_OK, "Equipo registrado exitosamente.", savedEquipo);
         } catch (Exception e) {
-            return new GenericResponse<>("ERROR", 0, "Error al registrar el equipo: " + e.getMessage(), null);
+            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Error al registrar el equipo: " + e.getMessage(), null);
         }
     }
 
@@ -54,39 +57,41 @@ public class EquipoService {
         }
         return sb.toString();
     }
+
     public GenericResponse<Equipo> updateEquipo(Equipo equipo) {
         if (equipo.getId() == 0 || !equipoRepository.existsById(equipo.getId())) {
-            return new GenericResponse<>("ERROR", 0, "Equipo no encontrado.", null);
+            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Equipo no encontrado.", null);
         }
         try {
             equipo.setFechaCompra(LocalDate.now());
             Equipo updatedEquipo = equipoRepository.save(equipo);
-            return new GenericResponse<>("SUCCESS", 1, "Equipo actualizado exitosamente.", updatedEquipo);
+            return new GenericResponse<>("SUCCESS", Global.RPTA_OK, "Equipo actualizado exitosamente.", updatedEquipo);
         } catch (Exception e) {
-            return new GenericResponse<>("ERROR", 0, "Error al actualizar el equipo: " + e.getMessage(), null);
+            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Error al actualizar el equipo: " + e.getMessage(), null);
         }
     }
 
     public GenericResponse<Void> deleteEquipo(Integer id) {
         if (!equipoRepository.existsById(id)) {
-            return new GenericResponse<>("ERROR", 0, "Equipo no encontrado.", null);
+            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Equipo no encontrado.", null);
         }
         try {
             equipoRepository.deleteById(id);
-            return new GenericResponse<>("SUCCESS", 1, "Equipo eliminado exitosamente.", null);
+            return new GenericResponse<>("SUCCESS", Global.RPTA_OK, "Equipo eliminado exitosamente.", null);
         } catch (Exception e) {
-            return new GenericResponse<>("ERROR", 0, "Error al eliminar el equipo: " + e.getMessage(), null);
+            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Error al eliminar el equipo: " + e.getMessage(), null);
         }
     }
 
     public GenericResponse<List<Equipo>> findAllEquipos() {
         try {
             List<Equipo> equipos = (List<Equipo>) equipoRepository.findAll();
-            return new GenericResponse<>("SUCCESS", 1, "Listado completo de equipos.", equipos);
+            return new GenericResponse<>("SUCCESS", Global.RPTA_OK, "Listado completo de equipos.", equipos);
         } catch (Exception e) {
-            return new GenericResponse<>("ERROR", 0, "Error al obtener el listado de equipos: " + e.getMessage(), null);
+            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Error al obtener el listado de equipos: " + e.getMessage(), null);
         }
     }
+
     public GenericResponse<Equipo> findEquipoByCodigoPatrimonial(String codigoPatrimonial) {
         Optional<Equipo> equipo = equipoRepository.findByCodigoPatrimonial(codigoPatrimonial);
         if (equipo.isPresent()) {
@@ -95,38 +100,35 @@ public class EquipoService {
             return new GenericResponse<>(Global.TIPO_DATA, Global.RPTA_WARNING, "Equipo no encontrado", null);
         }
     }
+
     public GenericResponse<Equipo> scanAndCopyBarcodeData(MultipartFile file) {
-        try {
-            InputStream inputStream = file.getInputStream();
+        try (InputStream inputStream = file.getInputStream()) {
             BufferedImage image = ImageIO.read(inputStream);
             if (image == null) {
                 throw new IllegalArgumentException("La imagen cargada es nula o el formato no es compatible.");
             }
             LuminanceSource source = new BufferedImageLuminanceSource(image);
             BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
-            MultiFormatReader reader = new MultiFormatReader(); // Soporta múltiples formatos
-            String barcodeText = reader.decode(bitmap).getText();
+            String barcodeText = new MultiFormatReader().decode(bitmap).getText();
 
             Optional<InventoryItems> informacion = inventoryItemsRepository.findByCodigoBarra(barcodeText);
             if (informacion.isPresent()) {
                 InventoryItems info = informacion.get();
                 Equipo nuevoEquipo = new Equipo(info);
                 Equipo savedEquipo = equipoRepository.save(nuevoEquipo);
-                return new GenericResponse<>("SUCCESS", 1, "Escaneo de Código de Barras correcto", savedEquipo);
+                return new GenericResponse<>("SUCCESS", Global.RPTA_OK, "Escaneo de Código de Barras correcto", savedEquipo);
             } else {
-                return new GenericResponse<>("WARNING", 0, "Código de barras no encontrado", null);
+                return new GenericResponse<>("WARNING", Global.RPTA_WARNING, "Código de barras no encontrado", null);
             }
         } catch (Exception e) {
-            e.printStackTrace(); // Imprime el stack trace para depuración
-            return new GenericResponse<>("ERROR", -1, "Error al procesar el archivo: " + e.toString(), null);
+            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Error al procesar el archivo: " + e.toString(), null);
         }
     }
 
     // Método para generar el Excel
     public byte[] generateExcelReport() throws Exception {
         List<Equipo> equipos = (List<Equipo>) equipoRepository.findAll();
-
-        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("Equipos");
 
             // Crear el encabezado
@@ -141,7 +143,6 @@ public class EquipoService {
             int rowIdx = 1;
             for (Equipo equipo : equipos) {
                 Row row = sheet.createRow(rowIdx++);
-
                 row.createCell(0).setCellValue(equipo.getId());
                 row.createCell(1).setCellValue(equipo.getTipoEquipo());
                 row.createCell(2).setCellValue(equipo.getCodigoBarra());
@@ -167,7 +168,4 @@ public class EquipoService {
             throw new Exception("Error al generar el reporte: " + e.getMessage());
         }
     }
-
-
-
 }

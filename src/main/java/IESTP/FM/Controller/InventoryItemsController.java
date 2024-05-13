@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/InventoryItems")
+@RequestMapping("/inventoryItems")
 public class InventoryItemsController {
 
     @Autowired
@@ -25,13 +25,12 @@ public class InventoryItemsController {
     @GetMapping("/generarCodigoBarra/{codigoPatrimonial}")
     public ResponseEntity<byte[]> generarCodigoBarra(@PathVariable String codigoPatrimonial) {
         GenericResponse<byte[]> response = inventoryItemsService.generateBarcodeImageForPatrimonialCode(codigoPatrimonial);
-        if (response.getRpta() == 1) {
+        if (response.getRpta() == Global.RPTA_OK) {
             return ResponseEntity.ok()
                     .header("Content-Type", "image/png")
                     .body(response.getBody());
         } else {
-            return ResponseEntity.badRequest()
-                    .body(null);
+            return ResponseEntity.badRequest().body(null);
         }
     }
 
