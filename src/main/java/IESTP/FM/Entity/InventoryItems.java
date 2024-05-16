@@ -53,6 +53,10 @@ public class InventoryItems {
     @JoinColumn(name = "ubicacion_id", nullable = true)
     private Ubicacion ubicacion;
 
+    @OneToOne
+    @JoinColumn(nullable = true)
+    private Foto foto;
+
     public InventoryItems() {
     }
 
@@ -187,5 +191,13 @@ public class InventoryItems {
 
     public void setUbicacion(Ubicacion ubicacion) {
         this.ubicacion = ubicacion;
+    }
+
+    public Foto getFoto() {
+        return foto;
+    }
+
+    public void setFoto(Foto foto) {
+        this.foto = foto;
     }
 }

@@ -54,6 +54,9 @@ public class Equipo {
     @JoinColumn(name = "ubicacion_id", nullable = true)
     private Ubicacion ubicacion;
 
+    @OneToOne
+    private Foto foto;
+
     public Equipo() {
     }
 
@@ -204,5 +207,13 @@ public class Equipo {
 
     public void setUbicacion(Ubicacion ubicacion) {
         this.ubicacion = ubicacion;
+    }
+
+    public Foto getFoto() {
+        return foto;
+    }
+
+    public void setFoto(Foto foto) {
+        this.foto = foto;
     }
 }
