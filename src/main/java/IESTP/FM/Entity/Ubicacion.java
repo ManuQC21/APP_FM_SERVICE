@@ -1,7 +1,12 @@
 package IESTP.FM.Entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "Ubicacion")
 public class Ubicacion {
@@ -29,27 +34,4 @@ public class Ubicacion {
         this.ubicacionFisica = ubicacionFisica;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getAmbiente() {
-        return ambiente;
-    }
-
-    public void setAmbiente(String ambiente) {
-        this.ambiente = ambiente;
-    }
-
-    public String getUbicacionFisica() {
-        return ubicacionFisica;
-    }
-
-    public void setUbicacionFisica(String ubicacionFisica) {
-        this.ubicacionFisica = ubicacionFisica;
-    }
 }

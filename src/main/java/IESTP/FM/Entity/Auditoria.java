@@ -1,9 +1,14 @@
 package IESTP.FM.Entity;
 
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "Auditoria")
 public class Auditoria {
@@ -40,43 +45,4 @@ public class Auditoria {
         this.equipo = equipo;
     }
 
-    public LocalDateTime getFechaAuditoria() {
-        return fechaAuditoria;
-    }
-
-    public void setFechaAuditoria(LocalDateTime fechaAuditoria) {
-        this.fechaAuditoria = fechaAuditoria;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getObservaciones() {
-        return observaciones;
-    }
-
-    public void setObservaciones(String observaciones) {
-        this.observaciones = observaciones;
-    }
-
-    public String getEstadoAuditoria() {
-        return estadoAuditoria;
-    }
-
-    public void setEstadoAuditoria(String estadoAuditoria) {
-        this.estadoAuditoria = estadoAuditoria;
-    }
-
-    public Equipo getEquipo() {
-        return equipo;
-    }
-
-    public void setEquipo(Equipo equipo) {
-        this.equipo = equipo;
-    }
 }

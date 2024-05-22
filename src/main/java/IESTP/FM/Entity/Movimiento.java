@@ -1,8 +1,12 @@
 package IESTP.FM.Entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
-
+@Setter
+@Getter
 @Entity
 @Table(name = "Movimiento")
 public class Movimiento {
@@ -46,62 +50,6 @@ public class Movimiento {
         this.motivoMovimiento = motivoMovimiento;
         this.equipo = equipo;
         this.ubicacionOrigen = ubicacionOrigen;
-        this.ubicacionDestino = ubicacionDestino;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getFechaMovimiento() {
-        return fechaMovimiento;
-    }
-
-    public void setFechaMovimiento(LocalDateTime fechaMovimiento) {
-        this.fechaMovimiento = fechaMovimiento;
-    }
-
-    public String getNombreResponsable() {
-        return nombreResponsable;
-    }
-
-    public void setNombreResponsable(String nombreResponsable) {
-        this.nombreResponsable = nombreResponsable;
-    }
-
-    public String getMotivoMovimiento() {
-        return motivoMovimiento;
-    }
-
-    public void setMotivoMovimiento(String motivoMovimiento) {
-        this.motivoMovimiento = motivoMovimiento;
-    }
-
-    public Equipo getEquipo() {
-        return equipo;
-    }
-
-    public void setEquipo(Equipo equipo) {
-        this.equipo = equipo;
-    }
-
-    public Ubicacion getUbicacionOrigen() {
-        return ubicacionOrigen;
-    }
-
-    public void setUbicacionOrigen(Ubicacion ubicacionOrigen) {
-        this.ubicacionOrigen = ubicacionOrigen;
-    }
-
-    public Ubicacion getUbicacionDestino() {
-        return ubicacionDestino;
-    }
-
-    public void setUbicacionDestino(Ubicacion ubicacionDestino) {
         this.ubicacionDestino = ubicacionDestino;
     }
 }

@@ -1,7 +1,11 @@
 package IESTP.FM.Entity;
 
-import javax.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+import javax.persistence.*;
+@Setter
+@Getter
 @Entity
 @Table(name = "Detalle_Auditoria")
 public class DetalleAuditoria {
@@ -35,35 +39,4 @@ public class DetalleAuditoria {
         this.auditoria = auditoria;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getResultadoAuditoria() {
-        return resultadoAuditoria;
-    }
-
-    public void setResultadoAuditoria(String resultadoAuditoria) {
-        this.resultadoAuditoria = resultadoAuditoria;
-    }
-
-    public String getObservaciones() {
-        return observaciones;
-    }
-
-    public void setObservaciones(String observaciones) {
-        this.observaciones = observaciones;
-    }
-
-    public Auditoria getAuditoria() {
-        return auditoria;
-    }
-
-    public void setAuditoria(Auditoria auditoria) {
-        this.auditoria = auditoria;
-    }
 }

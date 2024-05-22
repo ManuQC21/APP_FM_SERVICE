@@ -1,7 +1,12 @@
 package IESTP.FM.Entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "Usuario")
 public class Usuario {
@@ -16,43 +21,19 @@ public class Usuario {
     private boolean vigencia;
     @OneToOne
     private Empleado empleado;
-    public int getId() {
-        return id;
+
+    public Usuario() {
     }
 
-    public void setId(int id) {
+    public Usuario(int id) {
         this.id = id;
     }
 
-    public String getCorreo() {
-        return correo;
-    }
-
-    public void setCorreo(String correo) {
+    public Usuario(int id, String correo, String clave, boolean vigencia, Empleado empleado) {
+        this.id = id;
         this.correo = correo;
-    }
-
-    public String getClave() {
-        return clave;
-    }
-
-    public void setClave(String clave) {
         this.clave = clave;
-    }
-
-    public boolean isVigencia() {
-        return vigencia;
-    }
-
-    public void setVigencia(boolean vigencia) {
         this.vigencia = vigencia;
-    }
-
-    public Empleado getEmpleado() {
-        return empleado;
-    }
-
-    public void setEmpleado(Empleado empleado) {
         this.empleado = empleado;
     }
 }
