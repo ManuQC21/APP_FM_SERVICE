@@ -17,13 +17,13 @@ public class Equipo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "tipo_equipo", nullable = false, length = 255)
+    @Column(name = "tipo_equipo", nullable = true, length = 255)
     private String tipoEquipo;
 
-    @Column(name = "codigo_barra", length = 255)
+    @Column(name = "codigo_barra", nullable = true, length = 255)
     private String codigoBarra;
 
-    @Column(name = "codigo_patrimonial", nullable = false, length = 255)
+    @Column(name = "codigo_patrimonial", nullable = true,    length = 255)
     private String codigoPatrimonial;
 
     @Column(name = "descripcion", length = 255)

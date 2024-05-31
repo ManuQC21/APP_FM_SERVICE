@@ -1,7 +1,9 @@
 package IESTP.FM.Service;
 
+import IESTP.FM.Entity.Empleado;
 import IESTP.FM.Entity.Equipo;
 import IESTP.FM.Entity.InventoryItems;
+import IESTP.FM.Entity.Ubicacion;
 import IESTP.FM.Repository.EquipoRepository;
 import IESTP.FM.Repository.InventoryItemsRepository;
 import IESTP.FM.utils.GenericResponse;
@@ -21,6 +23,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -59,12 +62,38 @@ public class EquipoService {
     }
 
     public GenericResponse<Equipo> updateEquipo(Equipo equipo) {
-        if (equipo.getId() == 0 || !equipoRepository.existsById(equipo.getId())) {
+        if (equipo.getId() == 0) {
+            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "ID de equipo no proporcionado.", null);
+        }
+
+        Optional<Equipo> existingEquipo = equipoRepository.findById(equipo.getId());
+        if (!existingEquipo.isPresent()) {
             return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Equipo no encontrado.", null);
         }
+
         try {
-            equipo.setFechaCompra(LocalDate.now());
-            Equipo updatedEquipo = equipoRepository.save(equipo);
+            Equipo updatedEquipo = existingEquipo.get();
+
+            // Actualizando solo los campos permitidos
+            updatedEquipo.setTipoEquipo(equipo.getTipoEquipo());
+            updatedEquipo.setDescripcion(equipo.getDescripcion());
+            updatedEquipo.setEstado(equipo.getEstado());
+            updatedEquipo.setFechaCompra(equipo.getFechaCompra()); // Asumiendo que ya es LocalDate
+            updatedEquipo.setMarca(equipo.getMarca());
+            updatedEquipo.setModelo(equipo.getModelo());
+            updatedEquipo.setNombreEquipo(equipo.getNombreEquipo());
+            updatedEquipo.setNumeroOrden(equipo.getNumeroOrden());
+            updatedEquipo.setSerie(equipo.getSerie());
+
+            // Asignar responsable y ubicación si se proporcionan
+            if (equipo.getResponsable() != null && equipo.getResponsable().getId() > 0) {
+                updatedEquipo.setResponsable(new Empleado(equipo.getResponsable().getId()));
+            }
+            if (equipo.getUbicacion() != null && equipo.getUbicacion().getId() > 0) {
+                updatedEquipo.setUbicacion(new Ubicacion(equipo.getUbicacion().getId()));
+            }
+
+            equipoRepository.save(updatedEquipo);
             return new GenericResponse<>("SUCCESS", Global.RPTA_OK, "Equipo actualizado exitosamente.", updatedEquipo);
         } catch (Exception e) {
             return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Error al actualizar el equipo: " + e.getMessage(), null);
