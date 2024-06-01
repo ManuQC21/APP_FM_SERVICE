@@ -17,17 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -45,9 +41,9 @@ public class EquipoService {
         try {
             equipo.setCodigoBarra(generateRandomBarcode(12));
             Equipo savedEquipo = equipoRepository.save(equipo);
-            return new GenericResponse<>("SUCCESS", Global.RPTA_OK, "Equipo registrado exitosamente.", savedEquipo);
+            return new GenericResponse<>(Global.TIPO_CORRECTO, Global.RPTA_OK, "Equipo registrado exitosamente.", savedEquipo);
         } catch (Exception e) {
-            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Error al registrar el equipo: " + e.getMessage(), null);
+            return new GenericResponse<>(Global.TIPO_ERROR, Global.RPTA_ERROR, "Error al registrar el equipo: " + e.getMessage(), null);
         }
     }
 
@@ -63,12 +59,12 @@ public class EquipoService {
 
     public GenericResponse<Equipo> updateEquipo(Equipo equipo) {
         if (equipo.getId() == 0) {
-            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "ID de equipo no proporcionado.", null);
+            return new GenericResponse<>(Global.TIPO_ERROR, Global.RPTA_ERROR, "ID de equipo no proporcionado.", null);
         }
 
         Optional<Equipo> existingEquipo = equipoRepository.findById(equipo.getId());
         if (!existingEquipo.isPresent()) {
-            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Equipo no encontrado.", null);
+            return new GenericResponse<>(Global.TIPO_ERROR, Global.RPTA_ERROR, "Equipo no encontrado.", null);
         }
 
         try {
@@ -94,30 +90,30 @@ public class EquipoService {
             }
 
             equipoRepository.save(updatedEquipo);
-            return new GenericResponse<>("SUCCESS", Global.RPTA_OK, "Equipo actualizado exitosamente.", updatedEquipo);
+            return new GenericResponse<>(Global.TIPO_CORRECTO, Global.RPTA_OK, "Equipo actualizado exitosamente.", updatedEquipo);
         } catch (Exception e) {
-            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Error al actualizar el equipo: " + e.getMessage(), null);
+            return new GenericResponse<>(Global.TIPO_ERROR, Global.RPTA_ERROR, "Error al actualizar el equipo: " + e.getMessage(), null);
         }
     }
 
     public GenericResponse<Void> deleteEquipo(Integer id) {
         if (!equipoRepository.existsById(id)) {
-            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Equipo no encontrado.", null);
+            return new GenericResponse<>(Global.TIPO_ERROR, Global.RPTA_ERROR, "Equipo no encontrado.", null);
         }
         try {
             equipoRepository.deleteById(id);
-            return new GenericResponse<>("SUCCESS", Global.RPTA_OK, "Equipo eliminado exitosamente.", null);
+            return new GenericResponse<>(Global.TIPO_CORRECTO, Global.RPTA_OK, "Equipo eliminado exitosamente.", null);
         } catch (Exception e) {
-            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Error al eliminar el equipo: " + e.getMessage(), null);
+            return new GenericResponse<>(Global.TIPO_ERROR, Global.RPTA_ERROR, "Error al eliminar el equipo: " + e.getMessage(), null);
         }
     }
 
     public GenericResponse<List<Equipo>> findAllEquipos() {
         try {
             List<Equipo> equipos = (List<Equipo>) equipoRepository.findAll();
-            return new GenericResponse<>("SUCCESS", Global.RPTA_OK, "Listado completo de equipos.", equipos);
+            return new GenericResponse<>(Global.TIPO_CORRECTO, Global.RPTA_OK, "Listado completo de equipos.", equipos);
         } catch (Exception e) {
-            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Error al obtener el listado de equipos: " + e.getMessage(), null);
+            return new GenericResponse<>(Global.TIPO_ERROR, Global.RPTA_ERROR, "Error al obtener el listado de equipos: " + e.getMessage(), null);
         }
     }
 
@@ -145,12 +141,12 @@ public class EquipoService {
                 InventoryItems info = informacion.get();
                 Equipo nuevoEquipo = new Equipo(info);
                 Equipo savedEquipo = equipoRepository.save(nuevoEquipo);
-                return new GenericResponse<>("SUCCESS", Global.RPTA_OK, "Escaneo de Código de Barras correcto", savedEquipo);
+                return new GenericResponse<>(Global.TIPO_CORRECTO, Global.RPTA_OK, "Escaneo de Código de Barras correcto", savedEquipo);
             } else {
-                return new GenericResponse<>("WARNING", Global.RPTA_WARNING, "Código de barras no encontrado", null);
+                return new GenericResponse<>(Global.TIPO_CUIDADO, Global.RPTA_WARNING, "Código de barras no encontrado", null);
             }
         } catch (Exception e) {
-            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Error al procesar el archivo: " + e.toString(), null);
+            return new GenericResponse<>(Global.TIPO_ERROR, Global.RPTA_ERROR, "Error al procesar el archivo: " + e.toString(), null);
         }
     }
 
@@ -197,4 +193,18 @@ public class EquipoService {
             throw new Exception("Error al generar el reporte: " + e.getMessage());
         }
     }
+
+    public GenericResponse<Equipo> getEquipoById(int id) {
+        try {
+            Equipo equipo = equipoRepository.findByIdWithDetails(id);
+            if (equipo != null) {
+                return new GenericResponse<>(Global.TIPO_DATA, Global.RPTA_OK, Global.OPERACION_CORRECTA, equipo);
+            } else {
+                return new GenericResponse<>(Global.TIPO_RESULT, Global.RPTA_WARNING, "El equipo no existe", null);
+            }
+        } catch (Exception e) {
+            return new GenericResponse<>(Global.TIPO_ERROR, Global.RPTA_ERROR, Global.OPERACION_ERRONEA, null);
+        }
+    }
+
 }

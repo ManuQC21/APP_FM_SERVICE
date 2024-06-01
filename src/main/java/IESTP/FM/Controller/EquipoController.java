@@ -67,4 +67,10 @@ public class EquipoController {
             return ResponseEntity.status(500).body(null);
         }
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<GenericResponse<Equipo>> getEquipoById(@PathVariable int id) {
+        GenericResponse<Equipo> response = equipoService.getEquipoById(id);
+        return ResponseEntity.status(response.getRpta() == Global.RPTA_OK ? 200 : 404).body(response);
+    }
 }
