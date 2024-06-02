@@ -11,6 +11,8 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -28,6 +29,10 @@ import java.util.Optional;
 import java.util.Random;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.util.IOUtils;
+import java.io.FileInputStream;
+
+
 
 @Service
 @Transactional
@@ -169,9 +174,9 @@ public class EquipoService {
 
         // Draw barcode image with top margin
         g.drawImage(barcodeImage, 0, 20, null);
-        g.setColor(Color.BLACK);
-        g.setFont(new java.awt.Font(java.awt.Font.SANS_SERIF, Font.PLAIN, 12));
-
+        g.setColor(java.awt.Color.BLACK);
+        g.setFont(new java.awt.Font(java.awt.Font.SANS_SERIF, java.awt.Font.PLAIN, 12));
+        
         // Draw text below barcode
         FontMetrics fontMetrics = g.getFontMetrics();
         int textWidth = fontMetrics.stringWidth(data);
@@ -193,16 +198,64 @@ public class EquipoService {
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("Equipos");
 
-            // Crear el encabezado
-            String[] columns = {"ID", "Tipo Equipo", "Código Barra", "Código Patrimonial", "Descripción", "Estado", "Fecha Compra", "Marca", "Modelo", "Nombre Equipo", "Número Orden", "Serie"};
-            Row headerRow = sheet.createRow(0);
+            // Insertar el logo
+            FileInputStream inputStream = new FileInputStream("src/main/resources/logo.png");
+            byte[] bytes = IOUtils.toByteArray(inputStream);
+            int pictureIdx = workbook.addPicture(bytes, Workbook.PICTURE_TYPE_PNG);
+            inputStream.close();
+            CreationHelper helper = workbook.getCreationHelper();
+            Drawing<?> drawing = sheet.createDrawingPatriarch();
+            ClientAnchor anchor = helper.createClientAnchor();
+            anchor.setCol1(0);
+            anchor.setRow1(0);
+            Picture pict = drawing.createPicture(anchor, pictureIdx);
+            pict.resize();
+
+            // Crear un estilo para el título
+            CellStyle titleStyle = workbook.createCellStyle();
+            titleStyle.setAlignment(HorizontalAlignment.CENTER);
+            titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+            Font titleFont = workbook.createFont();
+            titleFont.setBold(true);
+            titleFont.setFontHeightInPoints((short) 16);
+            titleStyle.setFont(titleFont);
+
+            // Agregar título en la fila 3
+            Row titleRow = sheet.createRow(2); // Fila 3
+            Cell titleCell = titleRow.createCell(0);
+            titleCell.setCellValue("REPORTE TOTAL DE EQUIPOS");
+            titleCell.setCellStyle(titleStyle);
+            sheet.addMergedRegion(new CellRangeAddress(2, 2, 0, 15)); // Fusionar celdas para el título
+
+            // Estilo para encabezados
+            CellStyle headerStyle = workbook.createCellStyle();
+            headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            headerStyle.setAlignment(HorizontalAlignment.CENTER);
+            headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerStyle.setFont(headerFont);
+            headerStyle.setBorderBottom(BorderStyle.THIN);
+            headerStyle.setBorderTop(BorderStyle.THIN);
+            headerStyle.setBorderLeft(BorderStyle.THIN);
+            headerStyle.setBorderRight(BorderStyle.THIN);
+
+            // Crear el encabezado en la fila 6
+            String[] columns = {
+                    "ID", "Tipo Equipo", "Código Barra", "Código Patrimonial", "Descripción", "Estado",
+                    "Fecha Compra", "Marca", "Modelo", "Nombre Equipo", "Número Orden", "Serie",
+                    "Responsable - Nombre", "Responsable - Cargo", "Ubicación - Ambiente", "Ubicación - Ubicación Física"
+            };
+            Row headerRow = sheet.createRow(5); // Fila 6
             for (int col = 0; col < columns.length; col++) {
                 Cell cell = headerRow.createCell(col);
                 cell.setCellValue(columns[col]);
+                cell.setCellStyle(headerStyle);
             }
 
-            // Llenar datos
-            int rowIdx = 1;
+            // Llenar datos a partir de la fila 7
+            int rowIdx = 6;
             for (Equipo equipo : equipos) {
                 Row row = sheet.createRow(rowIdx++);
                 row.createCell(0).setCellValue(equipo.getId());
@@ -217,9 +270,14 @@ public class EquipoService {
                 row.createCell(9).setCellValue(equipo.getNombreEquipo());
                 row.createCell(10).setCellValue(equipo.getNumeroOrden());
                 row.createCell(11).setCellValue(equipo.getSerie());
+                row.createCell(12).setCellValue(equipo.getResponsable() != null ? equipo.getResponsable().getNombre() : "-");
+                row.createCell(13).setCellValue(equipo.getResponsable() != null ? equipo.getResponsable().getCargo() : "-");
+                row.createCell(14).setCellValue(equipo.getUbicacion() != null ? equipo.getUbicacion().getAmbiente() : "-");
+                row.createCell(15).setCellValue(equipo.getUbicacion() != null ? equipo.getUbicacion().getUbicacionFisica() : "-");
             }
 
-            // Auto-size all columns
+
+            // Ajuste automático de tamaño de columnas
             for (int i = 0; i < columns.length; i++) {
                 sheet.autoSizeColumn(i);
             }
@@ -230,6 +288,7 @@ public class EquipoService {
             throw new Exception("Error al generar el reporte: " + e.getMessage());
         }
     }
+
 
     public GenericResponse<Equipo> getEquipoById(int id) {
         try {

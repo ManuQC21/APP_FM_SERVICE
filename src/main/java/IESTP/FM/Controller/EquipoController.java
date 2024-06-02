@@ -52,16 +52,17 @@ public class EquipoController {
     @GetMapping("/descargarReporte")
     public ResponseEntity<byte[]> downloadExcelReport() {
         try {
-            byte[] report = equipoService.generateExcelReport();
+            byte[] bytes = equipoService.generateExcelReport();
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=equipos.xlsx");
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Reporte_De_Equipos.xlsx");
             headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
 
             return ResponseEntity.ok()
                     .headers(headers)
-                    .body(report);
+                    .body(bytes);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity.internalServerError()
+                    .body(null);
         }
     }
 
