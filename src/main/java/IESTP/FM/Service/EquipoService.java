@@ -2,15 +2,13 @@ package IESTP.FM.Service;
 
 import IESTP.FM.Entity.Empleado;
 import IESTP.FM.Entity.Equipo;
-import IESTP.FM.Entity.InventoryItems;
 import IESTP.FM.Entity.Ubicacion;
 import IESTP.FM.Repository.EquipoRepository;
-import IESTP.FM.Repository.InventoryItemsRepository;
 import IESTP.FM.utils.GenericResponse;
 import IESTP.FM.utils.Global;
-import com.google.zxing.MultiFormatReader;
-import com.google.zxing.BinaryBitmap;
-import com.google.zxing.LuminanceSource;
+import com.google.zxing.*;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +16,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -33,9 +35,6 @@ public class EquipoService {
 
     @Autowired
     private EquipoRepository equipoRepository;
-
-    @Autowired
-    private InventoryItemsRepository inventoryItemsRepository;
 
     public GenericResponse<Equipo> addEquipo(Equipo equipo) {
         try {
@@ -117,39 +116,77 @@ public class EquipoService {
         }
     }
 
-    public GenericResponse<Equipo> findEquipoByCodigoPatrimonial(String codigoPatrimonial) {
-        Optional<Equipo> equipo = equipoRepository.findByCodigoPatrimonial(codigoPatrimonial);
-        if (equipo.isPresent()) {
-            return new GenericResponse<>(Global.TIPO_DATA, Global.RPTA_OK, "Equipo encontrado", equipo.get());
-        } else {
-            return new GenericResponse<>(Global.TIPO_DATA, Global.RPTA_WARNING, "Equipo no encontrado", null);
-        }
-    }
-
     public GenericResponse<Equipo> scanAndCopyBarcodeData(MultipartFile file) {
         try (InputStream inputStream = file.getInputStream()) {
             BufferedImage image = ImageIO.read(inputStream);
             if (image == null) {
-                throw new IllegalArgumentException("La imagen cargada es nula o el formato no es compatible.");
+                return new GenericResponse<>(Global.TIPO_ERROR, Global.RPTA_WARNING, "La imagen cargada es nula o el formato no es compatible.", null);
             }
             LuminanceSource source = new BufferedImageLuminanceSource(image);
             BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
-            String barcodeText = new MultiFormatReader().decode(bitmap).getText();
+            Result result = new MultiFormatReader().decode(bitmap);
+            String barcodeText = result.getText();
 
-            Optional<InventoryItems> informacion = inventoryItemsRepository.findByCodigoBarra(barcodeText);
+            Optional<Equipo> informacion = equipoRepository.findByCodigoBarra(barcodeText);
             if (informacion.isPresent()) {
-                InventoryItems info = informacion.get();
-                Equipo nuevoEquipo = new Equipo(info);
-                Equipo savedEquipo = equipoRepository.save(nuevoEquipo);
-                return new GenericResponse<>(Global.TIPO_CORRECTO, Global.RPTA_OK, "Escaneo de Código de Barras correcto", savedEquipo);
+                return new GenericResponse<>(Global.TIPO_CORRECTO, Global.RPTA_OK, "Escaneo de Código de Barras correcto", informacion.get());
             } else {
                 return new GenericResponse<>(Global.TIPO_CUIDADO, Global.RPTA_WARNING, "Código de barras no encontrado", null);
             }
         } catch (Exception e) {
-            return new GenericResponse<>(Global.TIPO_ERROR, Global.RPTA_ERROR, "Error al procesar el archivo: " + e.toString(), null);
+            return new GenericResponse<>(Global.TIPO_ERROR, Global.RPTA_ERROR, "Error al procesar el archivo: " + e.getMessage(), null);
         }
     }
 
+    public GenericResponse<byte[]> generateBarcodeImageForPatrimonialCode(String codigoPatrimonial) {
+        Optional<Equipo> informacion = equipoRepository.findByCodigoPatrimonial(codigoPatrimonial);
+        if (informacion.isPresent()) {
+            try {
+                Equipo info = informacion.get();
+                String barcodeData = info.getCodigoBarra();  // Use only the barcode number
+                return new GenericResponse<>("SUCCESS", Global.RPTA_OK, "Código de barras generado exitosamente", generateBarcodeImage(barcodeData));
+            } catch (Exception e) {
+                return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "Error al generar el código de barras: " + e.getMessage(), null);
+            }
+        } else {
+            return new GenericResponse<>("ERROR", Global.RPTA_ERROR, "No se encontró información para el código patrimonial proporcionado", null);
+        }
+    }
+    private byte[] generateBarcodeImage(String data) throws Exception {
+        MultiFormatWriter barcodeWriter = new MultiFormatWriter();
+        BitMatrix bitMatrix = barcodeWriter.encode(data, BarcodeFormat.CODE_128, 300, 100);
+
+        // Convert BitMatrix to BufferedImage
+        BufferedImage barcodeImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
+
+        // Prepare to add text below barcode and margin at the top
+        BufferedImage combinedImage = new BufferedImage(barcodeImage.getWidth(), barcodeImage.getHeight() + 50, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = combinedImage.createGraphics();
+
+        // Fill background with white
+        g.setColor(java.awt.Color.WHITE);
+        g.fillRect(0, 0, combinedImage.getWidth(), combinedImage.getHeight());
+
+        // Draw barcode image with top margin
+        g.drawImage(barcodeImage, 0, 20, null);
+        g.setColor(Color.BLACK);
+        g.setFont(new java.awt.Font(java.awt.Font.SANS_SERIF, Font.PLAIN, 12));
+
+        // Draw text below barcode
+        FontMetrics fontMetrics = g.getFontMetrics();
+        int textWidth = fontMetrics.stringWidth(data);
+        int textX = (barcodeImage.getWidth() - textWidth) / 2; // Center text horizontally
+        int textY = barcodeImage.getHeight() + 40; // Position text below the barcode
+        g.drawString(data, textX, textY);
+
+        g.dispose(); // Clean up graphics object
+
+        // Write combined image to output byte array
+        try (ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream()) {
+            ImageIO.write(combinedImage, "PNG", pngOutputStream);
+            return pngOutputStream.toByteArray();
+        }
+    }
     // Método para generar el Excel
     public byte[] generateExcelReport() throws Exception {
         List<Equipo> equipos = (List<Equipo>) equipoRepository.findAll();
@@ -207,4 +244,30 @@ public class EquipoService {
         }
     }
 
+    public GenericResponse<List<Equipo>> filtroPorNombre(String nombreEquipo) {
+        try {
+            List<Equipo> equipos = equipoRepository.findByNombreEquipoContaining(nombreEquipo);
+            return new GenericResponse<>(Global.TIPO_DATA, Global.RPTA_OK, Global.OPERACION_CORRECTA, equipos);
+        } catch (Exception e) {
+            return new GenericResponse<>(Global.TIPO_ERROR, Global.RPTA_ERROR, Global.OPERACION_ERRONEA, null);
+        }
+    }
+
+    public GenericResponse<List<Equipo>> filtroCodigoPatrimonial(String codigoPatrimonial) {
+        try {
+            List<Equipo> equipos = equipoRepository.findByCodigoPatrimonialContaining(codigoPatrimonial);
+            return new GenericResponse<>(Global.TIPO_DATA, Global.RPTA_OK, Global.OPERACION_CORRECTA, equipos);
+        } catch (Exception e) {
+            return new GenericResponse<>(Global.TIPO_ERROR, Global.RPTA_ERROR, Global.OPERACION_ERRONEA, null);
+        }
+    }
+
+    public GenericResponse<List<Equipo>> filtroFechaCompraBetween(LocalDate fechaInicio, LocalDate fechaFin) {
+        try {
+            List<Equipo> equipos = equipoRepository.findByFechaCompraBetween(fechaInicio, fechaFin);
+            return new GenericResponse<>(Global.TIPO_DATA, Global.RPTA_OK, Global.OPERACION_CORRECTA, equipos);
+        } catch (Exception e) {
+            return new GenericResponse<>(Global.TIPO_ERROR, Global.RPTA_ERROR, Global.OPERACION_ERRONEA, null);
+        }
+    }
 }

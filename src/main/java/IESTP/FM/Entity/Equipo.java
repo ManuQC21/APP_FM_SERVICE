@@ -82,21 +82,4 @@ public class Equipo {
         this.responsable = responsable;
         this.ubicacion = ubicacion;
     }
-    public Equipo(InventoryItems inventoryItems) {
-        this.id = id;
-        this.tipoEquipo = inventoryItems.getTipoEquipo();
-        this.codigoBarra = inventoryItems.getCodigoBarra();
-        this.codigoPatrimonial = inventoryItems.getCodigoPatrimonial();
-        this.descripcion = inventoryItems.getDescripcion();
-        this.estado = inventoryItems.getEstado();
-        this.fechaCompra = inventoryItems.getFechaCompra();
-        this.marca = inventoryItems.getMarca();
-        this.modelo = inventoryItems.getModelo();
-        this.nombreEquipo = inventoryItems.getNombreEquipo();
-        this.numeroOrden = inventoryItems.getNumeroOrden();
-        this.serie = inventoryItems.getSerie();
-        this.responsable = inventoryItems.getResponsable();
-        this.ubicacion = inventoryItems.getUbicacion();
-    }
-
 }

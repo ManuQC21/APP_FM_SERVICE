@@ -5,12 +5,15 @@ import IESTP.FM.Service.EquipoService;
 import IESTP.FM.utils.GenericResponse;
 import IESTP.FM.utils.Global;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -40,12 +43,6 @@ public class EquipoController {
         return equipoService.findAllEquipos();
     }
 
-    @GetMapping("/buscarPorCodigoPatrimonial/{codigoPatrimonial}")
-    public ResponseEntity<GenericResponse<Equipo>> findEquipoByCodigoPatrimonial(@PathVariable String codigoPatrimonial) {
-        GenericResponse<Equipo> response = equipoService.findEquipoByCodigoPatrimonial(codigoPatrimonial);
-        return response.getRpta() == Global.RPTA_OK ? ResponseEntity.ok(response) : ResponseEntity.status(404).body(response);
-    }
-
     @PostMapping("/escanearCodigoBarra")
     public ResponseEntity<GenericResponse<Equipo>> escanearCodigoBarra(@RequestParam("file") MultipartFile file) {
         GenericResponse<Equipo> response = equipoService.scanAndCopyBarcodeData(file);
@@ -72,5 +69,34 @@ public class EquipoController {
     public ResponseEntity<GenericResponse<Equipo>> getEquipoById(@PathVariable int id) {
         GenericResponse<Equipo> response = equipoService.getEquipoById(id);
         return ResponseEntity.status(response.getRpta() == Global.RPTA_OK ? 200 : 404).body(response);
+    }
+
+    @GetMapping("/filtro/nombre")
+    public ResponseEntity<GenericResponse<List<Equipo>>> filtroPorNombre(@RequestParam String nombreEquipo) {
+        return ResponseEntity.ok(equipoService.filtroPorNombre(nombreEquipo));
+    }
+
+    @GetMapping("/filtro/codigoPatrimonial")
+    public ResponseEntity<GenericResponse<List<Equipo>>> filtroCodigoPatrimonial(@RequestParam String codigoPatrimonial) {
+        return ResponseEntity.ok(equipoService.filtroCodigoPatrimonial(codigoPatrimonial));
+    }
+
+    @GetMapping("/filtro/fechaCompra")
+    public ResponseEntity<GenericResponse<List<Equipo>>> filtroFechaCompraBetween(
+            @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fechaInicio,
+            @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fechaFin) {
+        return ResponseEntity.ok(equipoService.filtroFechaCompraBetween(fechaInicio, fechaFin));
+    }
+
+    @GetMapping("/generarCodigoBarra/{codigoPatrimonial}")
+    public ResponseEntity<byte[]> generarCodigoBarra(@PathVariable String codigoPatrimonial) {
+        GenericResponse<byte[]> response = equipoService.generateBarcodeImageForPatrimonialCode(codigoPatrimonial);
+        if (response.getRpta() == Global.RPTA_OK) {
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .body(response.getBody());
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 }
