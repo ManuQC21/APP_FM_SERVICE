@@ -1,11 +1,8 @@
 package IESTP.FM.Repository;
 
-
-
 import IESTP.FM.Entity.Foto;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-
 import java.util.Optional;
 
 public interface FotoRepository extends CrudRepository<Foto, Long> {
