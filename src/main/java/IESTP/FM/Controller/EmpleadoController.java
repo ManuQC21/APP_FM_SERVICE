@@ -12,15 +12,18 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("empleados")
+@RequestMapping("/empleados") // Asegurarse de que la ruta base es clara y correcta
 public class EmpleadoController {
 
     @Autowired
     private EmpleadoService empleadoService;
 
     @GetMapping("/listar")
-    public ResponseEntity<GenericResponse<List<Empleado>>> listarTodosLosEmpleados() {
+    public ResponseEntity<?> listarTodosLosEmpleados() {
         GenericResponse<List<Empleado>> response = empleadoService.listarTodosLosEmpleados();
+        if (response.getBody() == null || response.getBody().isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
         return ResponseEntity.ok(response);
     }
 }

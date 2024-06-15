@@ -6,10 +6,11 @@ import IESTP.FM.utils.GenericResponse;
 import IESTP.FM.utils.Global;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
+import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 @Service
+@Slf4j
 public class EmpleadoService {
 
     @Autowired
@@ -17,11 +18,11 @@ public class EmpleadoService {
 
     public GenericResponse<List<Empleado>> listarTodosLosEmpleados() {
         try {
-            List<Empleado> empleados = new ArrayList<>();
-            empleadoRepository.findAll().forEach(empleados::add);
-            return new GenericResponse<>(Global.TIPO_DATA, Global.RPTA_OK, Global.OPERACION_CORRECTA, empleados);
+            List<Empleado> empleados = (List<Empleado>) empleadoRepository.findAll();
+            return new GenericResponse<>(Global.TIPO_DATOS, Global.RESPUESTA_OK, Global.OPERACION_EXITOSA, empleados);
         } catch (Exception e) {
-            return new GenericResponse<>(Global.TIPO_RESULT, Global.RPTA_ERROR, Global.OPERACION_ERRONEA, null);
+            log.error("Error al listar empleados", e);
+            return new GenericResponse<>(Global.TIPO_RESULTADO, Global.RESPUESTA_ERROR, Global.OPERACION_ERRONEA, null);
         }
     }
 }

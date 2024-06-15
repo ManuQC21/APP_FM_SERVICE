@@ -7,7 +7,6 @@ import IESTP.FM.utils.Global;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,78 +21,68 @@ public class EquipoController {
     private EquipoService equipoService;
 
     @PostMapping("/agregar")
-    public GenericResponse<Equipo> addEquipo(@RequestBody Equipo equipo) {
-        return equipoService.addEquipo(equipo);
+    public ResponseEntity<GenericResponse<Equipo>> addEquipo(@RequestBody Equipo equipo) {
+        return ResponseEntity.ok(equipoService.addEquipo(equipo));
     }
 
     @PutMapping("/modificar")
-    public GenericResponse<Equipo> updateEquipo(@RequestBody Equipo equipo) {
-        return equipoService.updateEquipo(equipo);
+    public ResponseEntity<GenericResponse<Equipo>> updateEquipo(@RequestBody Equipo equipo) {
+        return ResponseEntity.ok(equipoService.updateEquipo(equipo));
     }
 
     @DeleteMapping("/eliminar/{id}")
-    public GenericResponse<Void> deleteEquipo(@PathVariable Integer id) {
-        return equipoService.deleteEquipo(id);
+    public ResponseEntity<GenericResponse<Void>> deleteEquipo(@PathVariable Integer id) {
+        return ResponseEntity.ok(equipoService.deleteEquipo(id));
     }
 
     @GetMapping("/listar")
-    public GenericResponse<List<Equipo>> listAllEquipos() {
-        return equipoService.findAllEquipos();
+    public ResponseEntity<GenericResponse<List<Equipo>>> listAllEquipos() {
+        return ResponseEntity.ok(equipoService.findAllEquipos());
     }
 
     @PostMapping("/escanearCodigoBarra")
-    public ResponseEntity<GenericResponse<Equipo>> escanearCodigoBarra(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<GenericResponse<Equipo>> scanBarcode(@RequestParam("file") MultipartFile file) {
         GenericResponse<Equipo> response = equipoService.scanAndCopyBarcodeData(file);
-        return response.getRpta() == Global.RPTA_OK ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
+        return response.getRpta() == Global.RESPUESTA_OK ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
     }
 
     @GetMapping("/descargarReporte")
-    public ResponseEntity<byte[]> downloadExcelReport() {
-        try {
-            byte[] bytes = equipoService.generateExcelReport();
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Reporte_De_Equipos.xlsx");
-            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(bytes);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                    .body(null);
-        }
+    public ResponseEntity<byte[]> downloadExcelReport() throws Exception {
+        byte[] bytes = equipoService.generateExcelReport();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=Reporte_De_Equipos.xlsx");
+        return ResponseEntity.ok().headers(headers).body(bytes);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GenericResponse<Equipo>> getEquipoById(@PathVariable int id) {
-        GenericResponse<Equipo> response = equipoService.getEquipoById(id);
-        return ResponseEntity.status(response.getRpta() == Global.RPTA_OK ? 200 : 404).body(response);
+        return ResponseEntity.ok(equipoService.getEquipoById(id));
     }
 
     @GetMapping("/filtro/nombre")
-    public ResponseEntity<GenericResponse<List<Equipo>>> filtroPorNombre(@RequestParam String nombreEquipo) {
+    public ResponseEntity<GenericResponse<List<Equipo>>> filterByName(@RequestParam String nombreEquipo) {
         return ResponseEntity.ok(equipoService.filtroPorNombre(nombreEquipo));
     }
 
     @GetMapping("/filtro/codigoPatrimonial")
-    public ResponseEntity<GenericResponse<List<Equipo>>> filtroCodigoPatrimonial(@RequestParam String codigoPatrimonial) {
+    public ResponseEntity<GenericResponse<List<Equipo>>> filterByPatrimonialCode(@RequestParam String codigoPatrimonial) {
         return ResponseEntity.ok(equipoService.filtroCodigoPatrimonial(codigoPatrimonial));
     }
 
     @GetMapping("/filtro/fechaCompra")
-    public ResponseEntity<GenericResponse<List<Equipo>>> filtroFechaCompraBetween(
-            @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fechaInicio,
-            @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fechaFin) {
-        return ResponseEntity.ok(equipoService.filtroFechaCompraBetween(fechaInicio, fechaFin));
+    public ResponseEntity<GenericResponse<List<Equipo>>> filterByPurchaseDate(
+            @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate endDate) {
+        return ResponseEntity.ok(equipoService.filtroFechaCompraBetween(startDate, endDate));
     }
 
     @GetMapping("/generarCodigoBarra/{codigoPatrimonial}")
-    public ResponseEntity<byte[]> generarCodigoBarra(@PathVariable String codigoPatrimonial) {
+    public ResponseEntity<byte[]> generateBarcode(@PathVariable String codigoPatrimonial) {
         GenericResponse<byte[]> response = equipoService.generateBarcodeImageForPatrimonialCode(codigoPatrimonial);
-        if (response.getRpta() == Global.RPTA_OK) {
-            return ResponseEntity.ok()
-                    .header("Content-Type", "image/png")
-                    .body(response.getBody());
+        if (response.getRpta() == Global.RESPUESTA_OK) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Type", "image/png");
+            return ResponseEntity.ok().headers(headers).body(response.getBody());
         } else {
             return ResponseEntity.badRequest().body(null);
         }

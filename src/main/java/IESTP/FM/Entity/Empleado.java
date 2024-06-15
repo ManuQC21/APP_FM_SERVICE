@@ -1,11 +1,14 @@
 package IESTP.FM.Entity;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.*;
 import javax.persistence.*;
+import javax.validation.constraints.*;
+
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 @Entity
 @Table(name = "Empleado")
 public class Empleado {
@@ -14,23 +17,19 @@ public class Empleado {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "nombre", nullable = false, length = 255)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @Pattern(regexp = "^[A-Za-z ]+$")
+    @Column(name = "nombre", nullable = false, length = 255, unique = true)
     private String nombre;
 
+    @NotNull
+    @Size(min = 1, max = 255)
+    @Pattern(regexp = "^[A-Za-z ]+$")
     @Column(name = "cargo", nullable = false, length = 255)
     private String cargo;
 
-    // Constructor vacío
-    public Empleado() {
-    }
-
     public Empleado(int id) {
         this.id = id;
-    }
-
-    public Empleado(int id, String nombre, String cargo) {
-        this.id = id;
-        this.nombre = nombre;
-        this.cargo = cargo;
     }
 }

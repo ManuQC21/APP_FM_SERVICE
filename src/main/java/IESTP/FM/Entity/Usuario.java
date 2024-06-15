@@ -1,39 +1,38 @@
 package IESTP.FM.Entity;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.*;
 import javax.persistence.*;
+import javax.validation.constraints.*;
 
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 @Entity
 @Table(name = "Usuario")
 public class Usuario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(length = 500)
+
+    @NotNull
+    @Email
+    @Size(max = 500)
+    @Column(length = 500, nullable = false, unique = true)
     private String correo;
-    @Column(length = 300)
+
+    @NotNull
+    @Size(min = 6, max = 300)
+    @Column(length = 300, nullable = false)
     private String clave;
-    @Column
+
+    @NotNull
+    @Column(nullable = false)
     private boolean vigencia;
+
     @OneToOne
+    @JoinColumn(name = "empleado_id", nullable = false)
     private Empleado empleado;
-
-    public Usuario() {
-    }
-
-    public Usuario(int id) {
-        this.id = id;
-    }
-
-    public Usuario(int id, String correo, String clave, boolean vigencia, Empleado empleado) {
-        this.id = id;
-        this.correo = correo;
-        this.clave = clave;
-        this.vigencia = vigencia;
-        this.empleado = empleado;
-    }
 }
