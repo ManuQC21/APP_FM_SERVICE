@@ -77,7 +77,7 @@ public class EquipoService {
         existingEquipo.setTipoEquipo(equipo.getTipoEquipo());
         existingEquipo.setDescripcion(equipo.getDescripcion());
         existingEquipo.setEstado(equipo.getEstado());
-        existingEquipo.setFechaCompra(equipo.getFechaCompra());
+        existingEquipo.setFechaRevision(equipo.getFechaRevision());
         existingEquipo.setMarca(equipo.getMarca());
         existingEquipo.setModelo(equipo.getModelo());
         existingEquipo.setNombreEquipo(equipo.getNombreEquipo());
@@ -257,7 +257,7 @@ public class EquipoService {
                 row.createCell(3).setCellValue(equipo.getCodigoPatrimonial());
                 row.createCell(4).setCellValue(equipo.getDescripcion());
                 row.createCell(5).setCellValue(equipo.getEstado());
-                row.createCell(6).setCellValue(equipo.getFechaCompra().toString());
+                row.createCell(6).setCellValue(equipo.getFechaRevision().toString());
                 row.createCell(7).setCellValue(equipo.getMarca());
                 row.createCell(8).setCellValue(equipo.getModelo());
                 row.createCell(9).setCellValue(equipo.getNombreEquipo());
@@ -325,9 +325,9 @@ public class EquipoService {
         }
     }
 
-    public GenericResponse<List<Equipo>> filtroFechaCompraBetween(LocalDate fechaInicio, LocalDate fechaFin) {
+    public GenericResponse<List<Equipo>> filtroFechaRevisionBetween(LocalDate fechaInicio, LocalDate fechaFin) {
         try {
-            List<Equipo> equipos = equipoRepository.findByFechaCompraBetween(fechaInicio, fechaFin);
+            List<Equipo> equipos = equipoRepository.findByFechaRevisionBetween(fechaInicio, fechaFin);
             if (equipos.isEmpty()) {
                 log.info("No se encontraron equipos entre las fechas: {} y {}", fechaInicio, fechaFin);
                 return new GenericResponse<>(Global.TIPO_ADVERTENCIA, Global.RESPUESTA_ADVERTENCIA, "No se encontraron equipos entre esas fechas.", null);

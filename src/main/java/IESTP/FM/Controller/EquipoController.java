@@ -73,7 +73,7 @@ public class EquipoController {
     public ResponseEntity<GenericResponse<List<Equipo>>> filterByPurchaseDate(
             @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate fechaInicio,
             @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate fechaFin) {
-        return ResponseEntity.ok(equipoService.filtroFechaCompraBetween(fechaInicio, fechaFin));
+        return ResponseEntity.ok(equipoService.filtroFechaRevisionBetween(fechaInicio, fechaFin));
     }
 
     @GetMapping("/generarCodigoBarra/{codigoPatrimonial}")

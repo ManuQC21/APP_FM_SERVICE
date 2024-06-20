@@ -25,7 +25,7 @@ public interface EquipoRepository extends CrudRepository<Equipo, Integer> {
     List<Equipo> findByCodigoPatrimonialContaining(String codigoPatrimonial);
 
     // Búsqueda de equipos por un rango de fechas de compra
-    List<Equipo> findByFechaCompraBetween(LocalDate fechaInicio, LocalDate fechaFin);
+    List<Equipo> findByFechaRevisionBetween(LocalDate fechaInicio, LocalDate fechaFin);
 
     // Consulta nativa para obtener detalles completos por ID
     @Query(value = "SELECT e.* FROM Equipo e LEFT JOIN Empleado emp ON e.responsable_id = emp.id LEFT JOIN Ubicacion u ON e.ubicacion_id = u.id WHERE e.id = :id", nativeQuery = true)

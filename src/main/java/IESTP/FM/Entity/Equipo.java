@@ -49,9 +49,9 @@ public class Equipo {
     private String estado;
 
     @NotNull
-    @Column(name = "fecha_compra", nullable = false)
+    @Column(name = "fecha_revision", nullable = false)
     @JsonFormat(pattern = "dd/MM/yyyy")
-    private LocalDate fechaCompra;
+    private LocalDate fechaRevision;
 
     @NotNull
     @Size(min = 1, max = 255)
